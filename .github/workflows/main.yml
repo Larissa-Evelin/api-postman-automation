@@ -1,45 +1,38 @@
-name: Testes API Postman
+name: Run Postman Tests
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
   pull_request:
-    branches: [main]
 
 jobs:
-  run-postman-tests:
+  test:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout recalhost.postman_environment.jsonpo
-      uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '20'
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
 
-    - name: Install dependencies
-      run: |
-        npm install -g newman newman-reporter-html
+      - name: Install Newman
+        run: npm install -g newman
 
-    - name: Start API
-      run: |
-        nohup node API/index.js &
-        sleep 45
+      - name: Install dependencies
+        run: npm install
 
-    - name: Create Postman Environment dynamically
-      run: |
-        echo '{
-          "name": "Localhost",
-          "values": [
-            { "key": "baseUrl", "value": "http://localhost:3000", "enabled": true }
-          ]
-        }' > Localhost.postman_environment.json
+      - name: Start API
+        run: |
+          node api/index.js &
+          sleep 5
+        shell: bash
 
-    - name: Run Postman Collection with CSV data
-      run: |
-        newman run collections/Treino.postman_collection.json \
-          -e Lo \
-          -d data/soma.csv \
-          -r cli,html
+      - name: Run Postman tests
+        run: |
+          newman run collections/Treino.postman_collection.json \
+            -e collections/Localhost.postman_environment.json \
+            -d data/soma.csv
