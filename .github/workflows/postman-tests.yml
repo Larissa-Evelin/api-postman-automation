@@ -28,7 +28,7 @@ jobs:
       - name: Start API
         run: |
           node api/index.js &
-          sleep 5
+          sleep 45
         shell: bash
 
       - name: Run Postman tests
