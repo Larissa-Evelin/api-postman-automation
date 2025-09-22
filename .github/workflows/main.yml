@@ -26,7 +26,7 @@ jobs:
     - name: Start API
       run: |
         nohup node API/index.js &
-        sleep 5
+        sleep 20
 
     - name: Create Postman Environment dynamically
       run: |
