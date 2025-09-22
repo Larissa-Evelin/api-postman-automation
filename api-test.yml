@@ -1,0 +1,26 @@
+name: Testes API Postman
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  run-postman-tests:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
+
+    - name: Install Newman
+      run: npm install -g newman
+
+    - name: Run Collection
+      run: newman run API-de-Treino.json -e Localhost.postman_environment.json -r cli,html
+  
