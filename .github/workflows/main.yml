@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repo
+    - name: Checkout recalhost.postman_environment.jsonpo
       uses: actions/checkout@v3
 
     - name: Setup Node.js
@@ -26,7 +26,7 @@ jobs:
     - name: Start API
       run: |
         nohup node API/index.js &
-        sleep 20
+        sleep 45
 
     - name: Create Postman Environment dynamically
       run: |
@@ -40,6 +40,6 @@ jobs:
     - name: Run Postman Collection with CSV data
       run: |
         newman run collections/Treino.postman_collection.json \
-          -e Localhost.postman_environment.json \
+          -e Lo \
           -d data/soma.csv \
           -r cli,html
