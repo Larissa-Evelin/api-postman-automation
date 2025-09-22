@@ -25,7 +25,7 @@ jobs:
       - name: Start API
         run: |
           node API/index.js &
-          sleep 5 # espera a API subir
+          sleep 5
 
       - name: Install Newman
         run: npm install -g newman
@@ -48,5 +48,9 @@ jobs:
             "_postman_exported_using": "Postman/10.0.0"
           }' > Localhost.postman_environment.json
 
-      - name: Run Collection
-        run: newman run API/API-de-Treino.json -e Localhost.postman_environment.json -r cli,html
+      - name: Run all Postman Collections
+        run: |
+          for file in collections/*.json; do
+            echo "Running $file"
+            newman run "$file" -e Localhost.postman_environment.json -r cli,html
+          done
