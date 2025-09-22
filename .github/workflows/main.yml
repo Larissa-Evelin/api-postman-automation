@@ -11,55 +11,35 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Pegar o código do repositório
-      - name: Checkout repo
-        uses: actions/checkout@v3
+    - name: Checkout repo
+      uses: actions/checkout@v3
 
-      # 2️⃣ Configurar Node.js
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20'
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20'
 
-      # 3️⃣ Instalar dependências da API (Express)
-      - name: Install dependencies
-        run: npm install
+    - name: Install dependencies
+      run: |
+        npm install -g newman newman-reporter-html
 
-      # 4️⃣ Instalar Newman e o reporter HTML
-      - name: Install Newman and HTML reporter
-        run: |
-          npm install -g newman
-          npm install -g newman-reporter-html
+    - name: Start API
+      run: |
+        nohup node API/index.js &
+        sleep 5
 
-      # 5️⃣ Rodar a API em background
-      - name: Start API
-        run: |
-          node api/index.js &
-          sleep 10  # espera a API subir
+    - name: Create Postman Environment dynamically
+      run: |
+        echo '{
+          "name": "Localhost",
+          "values": [
+            { "key": "baseUrl", "value": "http://localhost:3000", "enabled": true }
+          ]
+        }' > Localhost.postman_environment.json
 
-      # 6️⃣ Criar Environment Postman dinamicamente
-      - name: Create Postman Environment dynamically
-        run: |
-          echo '{
-            "id": "12345678-1234-1234-1234-123456789012",
-            "name": "Localhost",
-            "values": [
-              {
-                "key": "baseUrl",
-                "value": "http://localhost:3000",
-                "enabled": true
-              }
-            ],
-            "timestamp": 0,
-            "_postman_variable_scope": "environment",
-            "_postman_exported_at": "2025-09-22T00:00:00.000Z",
-            "_postman_exported_using": "Postman/10.0.0"
-          }' > Localhost.postman_environment.json
-
-      # 7️⃣ Rodar todas as Collections da pasta collections/
-      - name: Run all Postman Collections
-        run: |
-          for file in collections/*.json; do
-            echo "Running $file"
-            newman run "$file" -e Localhost.postman_environment.json -r cli,html
-          done
+    - name: Run Postman Collection with CSV data
+      run: |
+        newman run collections/Treino.postman_collection.json \
+          -e Localhost.postman_environment.json \
+          -d data/soma.csv \
+          -r cli,html
