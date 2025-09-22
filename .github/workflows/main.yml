@@ -19,6 +19,14 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Install dependencies
+        run: npm install
+
+      - name: Start API
+        run: |
+          node API/index.js &
+          sleep 5 # espera a API subir
+
       - name: Install Newman
         run: npm install -g newman
 
@@ -41,4 +49,4 @@ jobs:
           }' > Localhost.postman_environment.json
 
       - name: Run Collection
-        run: newman run API/index.json -e Localhost.postman_environment.json -r cli,html
+        run: newman run API/API-de-Treino.json -e Localhost.postman_environment.json -r cli,html
