@@ -1,13 +1,15 @@
-name: Run Postman Tests
+name: Testes API Postman
 
 on:
   push:
     branches:
       - main
   pull_request:
+    branches:
+      - main
 
 jobs:
-  test:
+  run-postman-tests:
     runs-on: ubuntu-latest
 
     steps:
@@ -17,10 +19,10 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: '20'
 
-      - name: Install Newman
-        run: npm install -g newman
+      - name: Install Newman + HTML reporter
+        run: npm install -g newman newman-reporter-html
 
       - name: Install dependencies
         run: npm install
@@ -28,11 +30,17 @@ jobs:
       - name: Start API
         run: |
           node api/index.js &
-          sleep 45
+          sleep 5
         shell: bash
 
-      - name: Run Postman tests
+      - name: Run /hello test (once)
         run: |
-          newman run collections/Treino.postman_collection.json \
+          newman run collections/Treino_hello.postman_collection.json \
+            -e collections/Localhost.postman_environment.json
+
+      - name: Run /soma test (with CSV)
+        run: |
+          newman run collections/Treino_soma.postman_collection.json \
             -e collections/Localhost.postman_environment.json \
-            -d data/soma.csv
+            -d data/soma.csv \
+            -r cli,html
