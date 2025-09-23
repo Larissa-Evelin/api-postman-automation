@@ -12,7 +12,7 @@ jobs:
   run-postman-tests:
     runs-on: ubuntu-latest
     env:
-      POSTMAN_API_KEY: ${{ secrets.POSTMAN_API_KEY }}
+      POSTMAN_API_KEY: ${{ secrets.POSTMAN_API_KEY }} 
 
     steps:
       # 1. Checkout do repositório
