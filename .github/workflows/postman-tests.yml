@@ -11,36 +11,46 @@ on:
 jobs:
   run-postman-tests:
     runs-on: ubuntu-latest
+    env:
+      POSTMAN_API_KEY: ${{ secrets.POSTMAN_API_KEY }}
 
     steps:
+      # 1. Checkout do repositório
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      # 2. Configuração do Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '20'
 
+      # 3. Instalação do Newman e do reporter HTML
       - name: Install Newman + HTML reporter
         run: npm install -g newman newman-reporter-html
 
+      # 4. Instalação das dependências do projeto
       - name: Install dependencies
         run: npm install
 
+      # 5. Início da API em segundo plano
       - name: Start API
         run: |
           node api/index.js &
           sleep 5
         shell: bash
 
-      - name: Run /hello test (once)
+      # 6. Execução do teste /hello diretamente do Postman Cloud
+      - name: Run /hello test
         run: |
-          newman run collections/Treino_hello.postman_collection.json \
-            -e collections/Localhost.postman_environment.json
+          newman run "https://api.getpostman.com/collections/18433690-ad2c624b-029d-4c2d-9ce7-2298d02489c0?apikey=$POSTMAN_API_KEY" \
+            -e "https://api.getpostman.com/environments/18433690-a53c2158-e6ab-4955-8396-d0a147bee832?apikey=$POSTMAN_API_KEY" \
+            -r cli,html
 
-      - name: Run /soma test (with CSV)
+      # 7. Execução do teste /soma com CSV diretamente do Postman Cloud
+      - name: Run /soma test
         run: |
-          newman run collections/Treino_soma.postman_collection.json \
-            -e collections/Localhost.postman_environment.json \
+          newman run "https://api.getpostman.com/collections/18433690-06163855-a4e6-45f7-95f2-5cd5df72213d?apikey=$POSTMAN_API_KEY" \
+            -e "https://api.getpostman.com/environments/18433690-a53c2158-e6ab-4955-8396-d0a147bee832?apikey=$POSTMAN_API_KEY" \
             -d data/soma.csv \
             -r cli,html
