@@ -38,7 +38,21 @@ jobs:
           sleep 5
         shell: bash
 
-      # 6. Rodar teste /hello com global-var
+      # 6. Baixar collection /hello do Postman Cloud
+      - name: Download Treino_hello collection
+        run: |
+          mkdir -p collections
+          curl -s -o collections/Treino_hello.postman_collection.json \
+          "https://api.getpostman.com/collections/18433690-ad2c624b-029d-4c2d-9ce7-2298d02489c0?apikey=${{ secrets.POSTMAN_API_KEY }}"
+
+      # 7. Baixar collection /soma do Postman Cloud
+      - name: Download Treino_soma collection
+        run: |
+          mkdir -p collections
+          curl -s -o collections/Treino_soma.postman_collection.json \
+          "https://api.getpostman.com/collections/18433690-06163855-a4e6-45f7-95f2-5cd5df72213d?apikey=${{ secrets.POSTMAN_API_KEY }}"
+
+      # 8. Rodar teste /hello com environment local e global-var
       - name: Run /hello test
         run: |
           newman run collections/Treino_hello.postman_collection.json \
@@ -46,7 +60,7 @@ jobs:
             --global-var "baseUrl=http://localhost:3000" \
             -r cli,html
 
-      # 7. Rodar teste /soma com CSV e global-var
+      # 9. Rodar teste /soma com CSV e global-var
       - name: Run /soma test
         run: |
           newman run collections/Treino_soma.postman_collection.json \
@@ -55,7 +69,7 @@ jobs:
             --global-var "baseUrl=http://localhost:3000" \
             -r cli,html
 
-      # 8. Salvar relatório HTML como artefato
+      # 10. Salvar relatório HTML como artefato
       - name: Upload Newman HTML report
         uses: actions/upload-artifact@v4
         with:
